@@ -2,10 +2,7 @@
 
 # Requirements
 
-It requires [rhino](https://developer.mozilla.org/en-US/docs/Rhino) to execute javascript in command line (as the encryption is
-done on client-side)
-
-Alternatively, you can now use [v8](https://developers.google.com/v8/build) instead of rhino.
+It requires `openssl` and a few bits of perl. That's it.
 
 # Usage
 
@@ -47,21 +44,21 @@ files in your working directory (if set) or in your script's directory
 I wrote `zerocli` for pasting output of commands on my servers without having to copy/paste
 them using *pipes*.
 
-As a side-effect, you can paste binary files :
+Now that it uses `openssl` instead of javascript, it is even easier to paste binary files:
 
 ``` bash
 $ file qrcode.png    
 qrcode.png: PNG image data, 248 x 248, 1-bit colormap, non-interlaced
 $ md5sum qrcode.png
 c4fc209e25e8b2703a5b2a2691a7d9b3  qrcode.png
-$ base64 qrcode.png | zerocli
+$ zerocli qrcode.png
 
 Encrypting data... [done]
 [i] OK server returned code 200
 Your data have been successfully pasted
 url: https://paste.example.org/?7951f1b227c52e83#ZZZZZZZZZZ6N3fFRSFIOfXlFMwSYzNa9dpGy0=
 delete url: https://paste.example.org/?pasteid=XXXXXXXXX&deletetoken=YYYYYYYYYYYYYY
-$ zerocli -g https://paste.example.org/?7951f1b227c52e83#ZZZZZZZZZZ6N3fFRSFIOfXlFMwSYzNa9dpGy0= | base64 -d >/tmp/getzerocli
+$ zerocli -g https://paste.example.org/?7951f1b227c52e83#ZZZZZZZZZZ6N3fFRSFIOfXlFMwSYzNa9dpGy0= >/tmp/getzerocli
 Decrypting data... [done]
 $ file /tmp/getzerocli
 /tmp/getzerocli: PNG image data, 248 x 248, 1-bit colormap, non-interlaced
