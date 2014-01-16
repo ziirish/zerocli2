@@ -246,7 +246,7 @@ function _loading () {
 	rm $tmpfile &>/dev/null
 	[ $ret -ne 0 ] && {
 		[ $quiet -ne 1 ] && echo -e "\r$msg... [failed]" >&2
-		myerror "Error: javascript engine returned code $ret"
+		myerror "Error: openssl returned code $ret"
 		cat $datafile >&2
 		rm $datafile &>/dev/null
 		exit $ret
@@ -299,12 +299,9 @@ function post() {
 
 	_loading $pid "Encrypting data"
 
-	base64 <$datafile >$tmpfile
-
 	# we need to 'htmlencode' our data before posting them. We use this hack to handle large data
-	encode=$(perl -MURI::Escape -e '@f=<>; foreach (@f) { print uri_escape($_); }' $tmpfile)
+	encode=$(perl -MURI::Escape -e '@f=<>; foreach (@f) { print uri_escape($_); }' $datafile)
 	rm $datafile
-	rm $tmpfile
 	params="data=$encode&burnafterreading=$burn&expire=$expire&opendiscussion=$open&syntaxcoloring=$syntax"
 
 	mycurl "$server" "$params"
@@ -351,7 +348,7 @@ function get() {
 		exit 3
 	}
 	clean=$(echo $str | sed -r "s/^.*(\[.*)$/\1/;s/^(.*\]).*$/\1/")
-	echo $clean | sed -r "s/^.*data\":(.*),\"meta.*$/\1/;s/^.(.*).$/\1/;s/\\\\n/\n/g" |base64 -d >$tmpfile
+	echo $clean | sed -r "s/^.*data\":(.*),\"meta.*$/\1/;s/^.(.*).$/\1/;s/\\\\n/\n/g;s/\\\\//g" >$tmpfile
 
 	openssl enc -aes-256-cbc -in $tmpfile -out $datafile -pass pass:"$key" -d -base64 &
 	pid=$!
